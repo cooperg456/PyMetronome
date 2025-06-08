@@ -5,14 +5,10 @@ import sounddevice as sd
 import numpy as np
 
 
-bpm = 400
-interval = 60 / bpm
-
-frequency = 440
-duration = 0.05
-fs = 48000
-
 def main():
+    bpm = 400
+    interval = 60 / bpm
+
     start_idx = 0
     frequency = 440
     amplitude = 0
