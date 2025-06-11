@@ -3,44 +3,7 @@ import time
 import sounddevice as sd
 import numpy as np
 
-class synthesize:
-    """
-    utilities for synthesizing metronome sounds
-    """
-    def envelope(attack: float,
-                 decay: float,
-                 sustain: float,
-                 release: float,
-                 sustain_len: float,
-                 samplerate: int) -> np.ndarray:
-        """
-        returns an array representing a linear ADSR envelope
-        - attack, decay, sustain_len, release should have units of seconds and values > 0
-        - sustain should have value 0 <= x <= 1
-        """
-        a = np.arange(int(attack * samplerate)) / (attack * samplerate)
-        d = 1 - np.arange(int(decay * samplerate)) * (1 - sustain) / (decay * samplerate)
-        s = np.ones(int(sustain_len * samplerate)) * sustain
-        r = sustain - np.arange(int(release * samplerate)) * sustain / (release * samplerate) if sustain > 0 else []
-        return np.concatenate((a, d, s, r))
-
-    def sine(frequency: float,
-             samples: int,
-             samplerate: int) -> np.ndarray:
-        """
-        returns an array representing a sine signal
-        """
-        t = np.linspace(0, samples / samplerate, samples, endpoint=False)
-        return np.sin(2 * np.pi * frequency * t)
-
-    def square(frequency: float,
-               samples: int,
-               samplerate: int) -> np.ndarray:
-        """
-        returns an array representing a square wave signal
-        """
-        t = np.linspace(0, samples / samplerate, samples, endpoint=False)
-        return np.sign(np.sin(2 * np.pi * frequency * t))
+import utils.synthesizer as synth
 
 
 def main():
@@ -51,8 +14,8 @@ def main():
     #print(output_device_info)
     samplerate = output_device_info['default_samplerate']
 
-    adsr = synthesize.envelope(0.01, 0.05, 0.4, 0.04, 0, samplerate)
-    click = (synthesize.square(880, len(adsr), samplerate) * adsr).reshape(-1, 1)
+    adsr = synth.envelope(0.01, 0.05, 0.4, 0.04, 0, samplerate)
+    click = (synth.square(880, len(adsr), samplerate) * adsr).reshape(-1, 1)
 
     sound_idx = 0
     sound_len = len(click) # precompute
